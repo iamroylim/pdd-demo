@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  pdd-demo:
+    build: 
+      context: .
+      dockerfile: Dockerfile.minimal
+    container_name: pdd-demo-container
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./cookies:/app/server/cookies
+    # 确保Chrome可以运行
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
+    restart: unless-stopped

@@ -1,0 +1,31 @@
+# 使用官方的Puppeteer镜像，已经包含Node.js和Chrome
+FROM ghcr.io/puppeteer/puppeteer:21.11.0
+
+WORKDIR /app
+
+# 设置Node.js版本为18（puppeteer镜像已包含）
+RUN node --version && npm --version
+
+# 创建非root用户
+RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
+    && mkdir -p /home/pptruser/Downloads \
+    && chown -R pptruser:pptruser /home/pptruser \
+    && chown -R pptruser:pptruser /app
+
+# 设置环境变量
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# 切换用户
+USER pptruser
+
+# 拷贝项目文件
+COPY --chown=pptruser:pptruser . /app
+
+# 安装依赖
+RUN npm install --production
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
